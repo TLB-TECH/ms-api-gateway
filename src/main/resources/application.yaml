@@ -39,6 +39,11 @@ spring:
           predicates:
             - Path=/fluxo-caixa/**
 
+        - id: ms-contas
+          uri: ${MS_CONTAS_URL:http://localhost:8087}
+          predicates:
+            - Path=/contas/**
+
 server:
   port: 8080
 
