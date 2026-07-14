@@ -42,7 +42,7 @@ spring:
         - id: ms-contas
           uri: ${MS_CONTAS_URL:http://localhost:8087}
           predicates:
-            - Path=/contas/**
+            - Path=/contas/**, /tipos-conta/**
 
 server:
   port: 8080
