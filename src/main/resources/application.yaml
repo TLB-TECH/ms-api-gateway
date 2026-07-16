@@ -44,6 +44,11 @@ spring:
           predicates:
             - Path=/contas/**, /tipos-conta/**
 
+        - id: ms-orcamento
+          uri: ${MS_ORCAMENTO_URL:http://localhost:8088}
+          predicates:
+            - Path=/orcamentos/**
+
 server:
   port: 8080
 
