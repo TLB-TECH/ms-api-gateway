@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -15,20 +16,24 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public abstract class JwtGatewayFilter implements GlobalFilter, Ordered {
+public class JwtGatewayFilter implements GlobalFilter, Ordered {
 
     private final JwtService jwtService;
 
+    // Rotas liberadas por caminho exato (não usar startsWith aqui: prefixos como
+    // "/usuarios" vazariam "/usuarios/me" e outras rotas autenticadas do mesmo serviço).
     private static final List<String> ROTAS_PUBLICAS = List.of(
             "/auth/login",
-            "/auth/registrar"
+            "/auth/recuperar-senha",
+            "/auth/redefinir-senha"
     );
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
+        HttpMethod method = exchange.getRequest().getMethod();
 
-        if (isRotaPublica(path)) {
+        if (isRotaPublica(path, method)) {
             return chain.filter(exchange);
         }
 
@@ -49,8 +54,14 @@ public abstract class JwtGatewayFilter implements GlobalFilter, Ordered {
         return chain.filter(exchange);
     }
 
-    private boolean isRotaPublica(String path) {
-        return ROTAS_PUBLICAS.stream().anyMatch(path::startsWith);
+    private boolean isRotaPublica(String path, HttpMethod method) {
+        if (HttpMethod.POST.equals(method) && "/usuarios".equals(path)) {
+            return true; // cadastro de novo usuário
+        }
+        if (HttpMethod.POST.equals(method) && "/webhooks/mercadopago".equals(path)) {
+            return true; // notificação do Mercado Pago - autenticada por assinatura HMAC, não JWT
+        }
+        return ROTAS_PUBLICAS.stream().anyMatch(path::equals);
     }
 
     @Override
