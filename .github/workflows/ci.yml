@@ -24,3 +24,4 @@ jobs:
         run: mvn clean verify
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          INTERNAL_SECRET: ${{ secrets.INTERNAL_SECRET }}

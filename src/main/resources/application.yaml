@@ -22,12 +22,12 @@ spring:
         - id: ms-usuarios
           uri: ${MS_USUARIOS_URL:http://localhost:8081}
           predicates:
-            - Path=/usuarios/**, /auth/**
+            - Path=/usuarios/**, /auth/**, /webhooks/**
 
         - id: ms-lancamentos
           uri: ${MS_LANCAMENTOS_URL:http://localhost:8083}
           predicates:
-            - Path=/lancamentos/**
+            - Path=/lancamentos/**, /cartoes/**
 
         - id: ms-centro-custo
           uri: ${MS_CENTRO_CUSTO_URL:http://localhost:8082}
@@ -47,7 +47,7 @@ spring:
         - id: ms-orcamento
           uri: ${MS_ORCAMENTO_URL:http://localhost:8088}
           predicates:
-            - Path=/orcamentos/**
+            - Path=/orcamentos/**, /metas-aplicacao/**
 
 server:
   port: 8080
@@ -55,3 +55,9 @@ server:
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:86400000}
+
+internal:
+  secret: ${INTERNAL_SECRET}
+
+ms-usuarios:
+  url: ${MS_USUARIOS_URL:http://localhost:8081}
